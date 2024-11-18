@@ -20,6 +20,7 @@ dependencies = [
     "dramatiq >= 1.2",
     "opentelemetry-api >= 1.11.0",
     "opentelemetry-instrumentation >= 0.31b0",
+    "opentelemetry-semantic-conventions",
 ]
 requires-python = ">=3.7"
 
