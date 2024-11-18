@@ -1,0 +1,30 @@
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opentelemetry-instrumentor-dramatiq"
+version = "0.1.0"
+description = "An instrumentor for dramatiq library"
+readme = "README.md"
+authors = [{ name = "Sunil", email = "shrest4647+pip@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["dramatiq", "opentelemetry", "instrumentation", "tracing", "telemetry"]
+dependencies = [
+    "dramatiq >= 1.2",
+    "opentelemetry-api >= 1.11.0",
+    "opentelemetry-instrumentation >= 0.31b0",
+]
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+dev = ["pytest", "pip-tools", "bumpver", "pika", "redis"]
+
+[project.urls]
+Homepage = "https://github.com/Shrest4647/opentelemetry-instrumentor-dramatiq"
