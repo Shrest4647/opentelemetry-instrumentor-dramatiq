@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opentelemetry-instrumentor-dramatiq"
-version = "0.1.1"
+version = "0.1.2"
 description = "An instrumentor for dramatiq library"
 readme = "README.md"
 authors = [{ name = "Sunil", email = "shrest4647+pip@gmail.com" }]
@@ -38,5 +38,5 @@ Homepage = "https://github.com/Shrest4647/opentelemetry-instrumentor-dramatiq"
 
 
 [bumpver]
-current_version = "0.1.1"
+current_version = "0.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
