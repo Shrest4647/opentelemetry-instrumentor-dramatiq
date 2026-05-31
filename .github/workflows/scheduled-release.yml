@@ -1,0 +1,51 @@
+name: scheduled patch release
+
+on:
+  schedule:
+    # Run every 4 months on the first day of January, May, and September.
+    - cron: "0 8 1 1,5,9 *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-patch-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Bump patch version
+        run: uv run bumpver update --patch --no-commit --no-tag-commit --no-push
+
+      - name: Refresh lockfile
+        run: uv lock
+
+      - name: Read package version
+        id: version
+        run: |
+          version=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Run tests
+        run: uv run pytest tests
+
+      - name: Create release pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: chore/scheduled-patch-release
+          delete-branch: true
+          title: "chore: bump patch release to v${{ steps.version.outputs.version }}"
+          commit-message: "chore: bump patch release to v${{ steps.version.outputs.version }}"
+          body: "Scheduled patch release PR. Merging this to main will publish through the existing publish workflow."

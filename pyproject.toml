@@ -1,6 +1,6 @@
 
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,9 +9,9 @@ version = "0.1.2"
 description = "An instrumentor for dramatiq library"
 readme = "README.md"
 authors = [{ name = "Sunil", email = "shrest4647+pip@gmail.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
@@ -28,7 +28,7 @@ dependencies = [
     "opentelemetry-instrumentation >= 0.31b0",
     "opentelemetry-semantic-conventions",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = ["pytest", "pip-tools", "bumpver", "pika", "redis"]
@@ -40,3 +40,12 @@ Homepage = "https://github.com/Shrest4647/opentelemetry-instrumentor-dramatiq"
 [bumpver]
 current_version = "0.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
+
+[bumpver.file_patterns]
+"pyproject.toml" = [
+    "^version = \"{version}\"",
+    "^current_version = \"{version}\"",
+]
+"opentelemetry_instrumentor_dramatiq/src/version.py" = [
+    "__version__ = \"{version}\"",
+]
