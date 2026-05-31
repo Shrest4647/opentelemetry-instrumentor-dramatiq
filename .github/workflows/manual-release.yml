@@ -1,0 +1,86 @@
+name: Manual Release
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: "Type of version bump"
+        required: true
+        default: "minor"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  manual-release:
+    name: Release - ${{ github.event.inputs.version_type }} bump
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Bump version (${{ github.event.inputs.version_type }})
+        id: version
+        run: |
+          OLD_VERSION=$(grep '^version = ' pyproject.toml | cut -d'"' -f2)
+          MAJOR=$(echo $OLD_VERSION | cut -d. -f1)
+          MINOR=$(echo $OLD_VERSION | cut -d. -f2)
+          PATCH=$(echo $OLD_VERSION | cut -d. -f3)
+          
+          if [ "${{ github.event.inputs.version_type }}" = "major" ]; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+          elif [ "${{ github.event.inputs.version_type }}" = "minor" ]; then
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+          elif [ "${{ github.event.inputs.version_type }}" = "patch" ]; then
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+          
+          # Update pyproject.toml
+          sed -i "s/version = \"$OLD_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+          
+          # Update src/version.py
+          sed -i "s/__version__ = \"$OLD_VERSION\"/__version__ = \"$NEW_VERSION\"/" opentelemetry_instrumentor_dramatiq/src/version.py
+          
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        run: |
+          git add pyproject.toml opentelemetry_instrumentor_dramatiq/src/version.py
+          git commit -m "chore: bump version ${{ steps.version.outputs.old_version }} -> ${{ steps.version.outputs.new_version }} (${{ github.event.inputs.version_type }})"
+
+      - name: Create Git tag
+        run: |
+          git tag -a v${{ steps.version.outputs.new_version }} -m "Release v${{ steps.version.outputs.new_version }} (${{ github.event.inputs.version_type }} bump)"
+
+      - name: Push changes and tag
+        run: |
+          git push origin main
+          git push origin v${{ steps.version.outputs.new_version }}
+
+      - name: Release summary
+        run: |
+          echo "✅ Manual release completed:"
+          echo "  Version: v${{ steps.version.outputs.new_version }}"
+          echo "  Type: ${{ github.event.inputs.version_type }}"
+          echo "📦 Publish workflow will be triggered automatically"

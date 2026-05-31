@@ -1,0 +1,16 @@
+[bumpver]
+current_version = "0.1.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "chore: bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_name = "v{new_version}"
+
+[[bumpver.file_patterns]]
+filename = "pyproject.toml"
+search = "version = \"{version}\""
+replace = "version = \"{new_version}\""
+
+[[bumpver.file_patterns]]
+filename = "opentelemetry_instrumentor_dramatiq/src/version.py"
+search = "__version__ = \"{version}\""
+replace = "__version__ = \"{new_version}\""
