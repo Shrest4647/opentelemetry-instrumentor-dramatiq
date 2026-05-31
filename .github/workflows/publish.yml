@@ -45,6 +45,5 @@ jobs:
       - name: Build the package
         run: uv build
 
-      - name: Run tests
-        # For example, using `pytest`
+      - name: Publish package
         run: uv publish --token ${{ secrets.PYPI_TOKEN }}
