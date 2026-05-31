@@ -16,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
@@ -44,6 +46,8 @@ jobs:
       - name: Create release pull request
         uses: peter-evans/create-pull-request@v8
         with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          base: main
           branch: chore/scheduled-patch-release
           delete-branch: true
           title: "chore: bump patch release to v${{ steps.version.outputs.version }}"
